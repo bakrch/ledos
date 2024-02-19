@@ -21,14 +21,16 @@ var (
 	canvas   = rgbmatrix.NewCanvas(matrix)
 )
 
+func Render() {
+	canvas.Render()
+}
+
 func Dashboard() {
 	whiteColor := color.RGBA{R: 255, G: 0, B: 0, A: 255} // This is a lie
 	drawImage(canvas, "./ledos/static/img/image.jpg")
-	DrawIsoscelesTriangle(image.Point{X: 44, Y: 5}, 5, 1, whiteColor)
 	writeText(canvas, 4, 8, "GUTTEN TAG", whiteColor)
 	writeText(canvas, 4, 18, "GUTTEN TAG", whiteColor)
 	writeText(canvas, 4, 28, "GUTTEN TAG", whiteColor)
-	canvas.Render()
 }
 
 /*
@@ -46,47 +48,10 @@ Directions (of the tip) :
 			 4
 */
 func DrawIsoscelesTriangle(tip image.Point, h int, direction int, color color.Color) {
-	var heightBound int
-	var saBound int
-	var sbBound int
-	b := canvas.Bounds()
-
-	switch direction {
-	case 1:
-		heightBound = b.Max.X
-		saBound = b.Max.X
-		sbBound = b.Max.X
-
-	case 2:
-		heightBound = b.Max.X
-		saBound = b.Max.X
-		sbBound = b.Max.X
-
-	case 3:
-		heightBound = b.Max.X
-		saBound = b.Max.X
-		sbBound = b.Max.X
-
-	case 4:
-		heightBound = b.Max.X
-		saBound = b.Max.X
-		sbBound = b.Max.X
-	}
-	println(heightBound)
-	println(saBound)
-	println(sbBound)
-
 	x := tip.X
 	y := tip.Y
-
-	println(x)
-	println(y)
-
 	for i := x; i < h+x; i++ {
-		println("loop: ", x-i)
 		for j := 0; j < i-x; j++ {
-			println(i, y+j)
-			println(i, y-j)
 			canvas.Set(i, y+j, color)
 			canvas.Set(i, y-j, color)
 		}
@@ -137,7 +102,7 @@ func initRgbMatrix() rgbmatrix.Matrix {
 		chain                    = flag.Int("led-chain", 1, "number of displays daisy-chained")
 		rgb_sequence             = flag.String("led-rgb-sequence", "RBG", "Order of colors on the matrix")
 		brightness               = flag.Int("brightness", 100, "brightness (0-100)")
-		hardware_mapping         = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
+		hardware_mapping         = flag.String("led-gpio-mapping", "adafruit-hat-pwm", "Name of GPIO mapping used.")
 		show_refresh             = flag.Bool("led-show-refresh", false, "Show refresh rate.")
 		inverse_colors           = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
 		disable_hardware_pulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")

@@ -1,3 +1,4 @@
-./main
+main
 .vscode/
 go.sum
+.env
