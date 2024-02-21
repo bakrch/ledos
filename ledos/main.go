@@ -21,6 +21,10 @@ var (
 	canvas   = rgbmatrix.NewCanvas(matrix)
 )
 
+func GetCanvas() (canvas rgbmatrix.Canvas) {
+	return canvas
+}
+
 func Render() {
 	canvas.Render()
 }

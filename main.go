@@ -3,12 +3,14 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"image"
 	"image/color"
 	"log"
 	"main/api/spotify"
 	"main/ledos"
 	"main/ledos/gpio"
+	"main/ui"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -34,8 +36,25 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	// DEBUG
-	spotify.Init()
-	spotify.TriggerAuth()
+	// spotify.Init()
+	// spotify.TriggerAuth()
+	var img = make([][]color.Color, 10)
+	for i := 0; i < 10; i++ {
+		img[i] = make([]color.Color, 10)
+
+		for j := 0; j < 10; j++ {
+			img[i][j] = color.White
+		}
+	}
+
+	customColor := color.RGBA{R: 0, G: 0, B: 255, A: 255}
+	ledos.DrawIsoscelesTriangle(image.Point{X: 32, Y: 8}, 5, 1, customColor)
+
+	var comp = ui.CreateComponent(10, 10, 10, 10, img)
+	var canvas = ledos.GetCanvas()
+	fmt.Println("Canvas in main", canvas)
+	comp.Render(&canvas)
+	ledos.Render()
 while:
 	for {
 		text, err = reader.ReadString('\n')
