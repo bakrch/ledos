@@ -3,14 +3,13 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"image"
 	"image/color"
 	"log"
 	"main/api/spotify"
 	"main/ledos"
 	"main/ledos/gpio"
-	"main/ui"
+	"main/uilib"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -47,13 +46,14 @@ func main() {
 		}
 	}
 
-	customColor := color.RGBA{R: 0, G: 0, B: 255, A: 255}
-	ledos.DrawIsoscelesTriangle(image.Point{X: 32, Y: 8}, 5, 1, customColor)
+	// customColor := color.RGBA{R: 0, G: 0, B: 255, A: 255}
+	// ledos.DrawIsoscelesTriangle(image.Point{X: 32, Y: 8}, 5, 1, customColor)
 
-	var comp = ui.CreateComponent(10, 10, 10, 10, img)
-	var canvas = ledos.GetCanvas()
-	fmt.Println("Canvas in main", canvas)
-	comp.Render(&canvas)
+	var c1 = uilib.CreateComponent(ledos.Canvas, 10, 10, 10, 10, img)
+	var c2 = uilib.CreateComponent(ledos.Canvas, 30, 10, 10, 10, img)
+	c1.Render(ledos.Canvas)
+	c2.Render(ledos.Canvas)
+	c1.SimpleHighlight()
 	ledos.Render()
 while:
 	for {
@@ -64,11 +64,11 @@ while:
 		case "q\n":
 			break while
 
-		case "t\n":
-			spotify.DoStuff()
+		case "m\n":
+			oc := gpio.CreateMainController(ledos.Canvas)
+			oc.Run()
 		case "s\n":
 			spotify.Init()
-			spotify.DoStuff()
 		case "gpio\n":
 			go gpio.TestGpio(encoderRotation)
 		case "tr\n":

@@ -8,6 +8,7 @@ require (
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/nsf/termbox-go v1.1.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/stianeikeland/go-rpio/v4 v4.6.0

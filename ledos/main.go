@@ -18,23 +18,19 @@ import (
 var (
 	debugLog = log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 	matrix   = initRgbMatrix()
-	canvas   = rgbmatrix.NewCanvas(matrix)
+	Canvas   = rgbmatrix.NewCanvas(matrix)
 )
 
-func GetCanvas() (canvas rgbmatrix.Canvas) {
-	return canvas
-}
-
 func Render() {
-	canvas.Render()
+	Canvas.Render()
 }
 
 func Dashboard() {
 	whiteColor := color.RGBA{R: 255, G: 0, B: 0, A: 255} // This is a lie
-	drawImage(canvas, "./ledos/static/img/image.jpg")
-	writeText(canvas, 4, 8, "GUTTEN TAG", whiteColor)
-	writeText(canvas, 4, 18, "GUTTEN TAG", whiteColor)
-	writeText(canvas, 4, 28, "GUTTEN TAG", whiteColor)
+	writeText(Canvas, 4, 8, "GUTTEN TAG", whiteColor)
+	writeText(Canvas, 4, 18, "GUTTEN TAG", whiteColor)
+	writeText(Canvas, 4, 28, "GUTTEN TAG", whiteColor)
+	Canvas.Render()
 }
 
 /*
@@ -56,26 +52,26 @@ func DrawIsoscelesTriangle(tip image.Point, h int, direction int, color color.Co
 	y := tip.Y
 	for i := x; i < h+x; i++ {
 		for j := 0; j < i-x; j++ {
-			canvas.Set(i, y+j, color)
-			canvas.Set(i, y-j, color)
+			Canvas.Set(i, y+j, color)
+			Canvas.Set(i, y-j, color)
 		}
 	}
 }
 func FillColor(color color.Color) {
-	b := canvas.Bounds()
+	b := Canvas.Bounds()
 	for x := b.Min.X; x < b.Max.X; x++ {
 		for y := b.Min.Y; y < b.Max.Y; y++ {
-			canvas.Set(x, y, color)
+			Canvas.Set(x, y, color)
 		}
 	}
-	canvas.Render()
+	Canvas.Render()
 }
 
 func Sakura() {
 	customColor := color.RGBA{R: 255, G: 0, B: 0, A: 255}
-	drawImage(canvas, "./ledos/static/img/sakura-bg.png")
-	writeText(canvas, 4, 8, "GUTTEN TAG", customColor)
-	canvas.Render()
+	// drawImage(Canvas, "./ledos/static/img/sakura-bg.png")
+	writeText(Canvas, 4, 8, "GUTTEN TAG", customColor)
+	Canvas.Render()
 	// scanner := bufio.NewScanner(os.Stdin)
 	// fmt.Println("Press Enter to exit...")
 	// scanner.Scan()
@@ -150,28 +146,24 @@ func writeText(canvas draw.Image, x int, y int, text string, textColor color.Col
 	d.DrawString(text)
 }
 
-func drawImage(canvas *rgbmatrix.Canvas, imagePath string) {
-
-	file, err := os.Open(imagePath)
-
-	fatal(err, debugLog)
-	defer file.Close()
-	img, _, err := image.Decode(file)
-
+func DrawImage(canvas *rgbmatrix.Canvas, img image.Image, at image.Point) [][]color.Color {
 	// Create a new RGBA image with the same bounds as the original image
 	bounds := img.Bounds()
 	rgba := image.NewRGBA(bounds)
 
+	var imgArray = make([][]color.Color, bounds.Max.X)
 	// Convert each pixel from RGBA64 to RGBA
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+	for x := bounds.Min.X; x < bounds.Max.X; x++ {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			imgArray[y-bounds.Min.Y] = make([]color.Color, bounds.Max.Y)
+			imgArray[x-bounds.Min.X][y-bounds.Min.Y] = img.At(x, y)
+
 			rgba.Set(x, y, img.At(x, y))
 		}
 	}
 
-	fatal(err, debugLog)
-	// defer canvas.Close()
-	draw.Draw(canvas, canvas.Bounds(), rgba, image.Point{}, draw.Src)
+	// draw.Draw(canvas, canvas.Bounds(), rgba, at, draw.Src)
+	return imgArray
 }
 
 func fatal(err error, logger *log.Logger) {

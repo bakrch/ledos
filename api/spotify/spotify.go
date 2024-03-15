@@ -27,6 +27,32 @@ type tokenResponse struct {
 	Scope        string  `json:"scope"`
 }
 
+type device struct {
+	Id           string `json:"id"`
+	IsActive     bool   `json:"is_active"`
+	IsRestricted bool   `json:"is_restricted"`
+	Name         string `json:"name"`
+	Type         string `json:"type"`
+}
+type image struct {
+	Url    string `json:"url"`
+	Height int    `json:"height"`
+	Width  int    `json:"Width"`
+}
+
+type album struct {
+	Images []image
+}
+
+type item struct {
+	Album album `json:"album"`
+}
+
+type PlayerData struct {
+	Device device `json:"device"`
+	Item   item   `json:"item"`
+}
+
 func loadDotEnv() {
 	err := godotenv.Load()
 	if err != nil {
@@ -89,13 +115,12 @@ func Init() {
 		if err != nil {
 			screamAndDie(err, apiLog)
 		}
-		// Use the access token to access the Spotify Web API
 	})
 	go func() {
 		http.ListenAndServe(":8080", nil)
 	}()
-
 }
+
 func TriggerAuth() {
 	apiLog.Printf("Go to http://raspberrypi:8080/login to login to spotify")
 	// rsp, err := http.Get("http://raspberrypi:8080/login")
@@ -107,6 +132,7 @@ func TriggerAuth() {
 	// fmt.Print(string(body))
 	// fmt.Print(accessToken)
 }
+
 func DoStuff() {
 	fmt.Println("accessToken", accessToken)
 
@@ -124,6 +150,7 @@ func DoStuff() {
 	fmt.Println(&playerData.Device)
 	Get("/users/bakr.chakk/playlists", &playerData)
 }
+
 func Get(endpoint string, jsonStruct interface{}) {
 	req, err := http.NewRequest("GET", "https://api.spotify.com/v1"+endpoint, nil)
 	screamAndDie(err, apiLog)
@@ -140,27 +167,14 @@ func Get(endpoint string, jsonStruct interface{}) {
 	// fmt.Println(endpoint, ": ", jsonStruct.Device)
 
 }
-func getUserInfo() {
-	req, err := http.NewRequest("GET", "https://api.spotify.com/v1/me", nil)
-	screamAndDie(err, apiLog)
-	req.Header.Set("Authorization", "Bearer "+accessToken.AccessToken)
-	// Make the API request
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	screamAndDie(err, apiLog)
-	defer resp.Body.Close()
+func GetPlaybackState() *PlayerData {
+	var pd PlayerData
+	Get("/me/player", &pd)
+	return &pd
 
-	// Print the response body (for demonstration purposes)
-	var responseBody struct {
-		ID string `json:"id"`
-	}
-	err = json.NewDecoder(resp.Body).Decode(&responseBody)
-	screamAndDie(err, apiLog)
-	fmt.Printf("User ID: %s\n", responseBody.ID)
-
-	// Redirect the client with the access token and refresh token
 }
+
 func getToken(code string) (token *tokenResponse, err error) {
 
 	var (
