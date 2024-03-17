@@ -16,7 +16,7 @@ type OsController struct {
 func CreateMainController(cnv *rgbmatrix.Canvas) OsController {
 	var oc OsController
 	oc.canvas = cnv
-	oc.apps = make([]*uilib.UI, 1)
+	oc.apps = make([]*uilib.UI, 0)
 	spotifyApp := apps.Spotify(oc.canvas)
 
 	oc.apps = append(oc.apps, spotifyApp)

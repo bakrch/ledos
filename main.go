@@ -66,7 +66,9 @@ while:
 
 		case "m\n":
 			oc := gpio.CreateMainController(ledos.Canvas)
+
 			oc.Run()
+			ledos.Render()
 		case "s\n":
 			spotify.Init()
 		case "gpio\n":

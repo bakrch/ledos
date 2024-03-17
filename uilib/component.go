@@ -109,12 +109,12 @@ func (c Component) SimpleHighlight() {
 	}
 }
 
-// Only draws to the canvas, doesn't actually render the component until canvas.Render() is called
 func (c Component) Render(canvas *rgbmatrix.Canvas) {
 	i := 0
-	for y := c.Placement.Min.Y; y < c.Placement.Max.Y; y++ {
+	for x := c.Placement.Min.X; x < c.Placement.Max.X; x++ {
 		j := 0
-		for x := c.Placement.Min.X; x < c.Placement.Max.X; x++ {
+		for y := c.Placement.Min.Y; y < c.Placement.Max.Y; y++ {
+			fmt.Println("i, j", i, j)
 			canvas.Set(x, y, c.At(i, j))
 			j++
 		}

@@ -149,19 +149,14 @@ func writeText(canvas draw.Image, x int, y int, text string, textColor color.Col
 func DrawImage(canvas *rgbmatrix.Canvas, img image.Image, at image.Point) [][]color.Color {
 	// Create a new RGBA image with the same bounds as the original image
 	bounds := img.Bounds()
-	rgba := image.NewRGBA(bounds)
-
-	var imgArray = make([][]color.Color, bounds.Max.X)
+	imgArray := make([][]color.Color, bounds.Max.X-bounds.Min.X)
 	// Convert each pixel from RGBA64 to RGBA
 	for x := bounds.Min.X; x < bounds.Max.X; x++ {
+		imgArray[x-bounds.Min.X] = make([]color.Color, bounds.Max.Y-bounds.Min.Y)
 		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			imgArray[y-bounds.Min.Y] = make([]color.Color, bounds.Max.Y)
 			imgArray[x-bounds.Min.X][y-bounds.Min.Y] = img.At(x, y)
-
-			rgba.Set(x, y, img.At(x, y))
 		}
 	}
-
 	// draw.Draw(canvas, canvas.Bounds(), rgba, at, draw.Src)
 	return imgArray
 }
