@@ -5,11 +5,32 @@ import (
 	"image"
 	"image/color"
 	"main/ledos"
+	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-func TestGpio(direction <-chan int) {
+func InputController(direction <-chan int) {
+	done := make(chan bool)
+	stop := make(chan bool)
+	GLOBAL_REFRESH_RATE := 500
+	oc := CreateMainController(ledos.Canvas)
+
+	oc.Run()
+
+	go func() {
+		ticker := time.NewTicker(time.Duration(GLOBAL_REFRESH_RATE) * time.Millisecond)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				ledos.Render()
+			case <-stop:
+				done <- true
+				return
+			}
+		}
+	}()
 	err := rpio.Open()
 	defer rpio.Close()
 	if err != nil {
@@ -49,9 +70,6 @@ func TestGpio(direction <-chan int) {
 				menuChoice = -1 * menuChoice
 			}
 			fmt.Println("dt ", dt, "clk ", clk, "previousClk", baseClk)
-			customColor := color.RGBA{R: 255, G: 0, B: 0, A: 255}
-			ledos.Dashboard()
-			ledos.DrawIsoscelesTriangle(image.Point{X: 44, Y: menuChoice + 3}, 5, 1, customColor)
 
 			// To prevent it from reading more than once per rotary encoder rotatio
 			for clkPin.Read() != baseClk {

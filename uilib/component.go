@@ -12,15 +12,22 @@ type ComponentState map[string]interface{}
 type Input struct {
 	Type string
 }
-type InputAction map[Input]func()
+type InputActions struct {
+	Click       func()
+	DoubleClick func()
+	TripleClick func()
+	HoldClick   func()
+	ScrollLeft  func()
+	ScrollRight func()
+}
 type Component struct {
-	Placement    image.Rectangle
-	StaticFill   [][]color.Color
-	Refresh      func(*Component)
-	Selected     bool
-	InputActions []InputAction
-	RefreshRate  int
-	State        ComponentState
+	Placement   image.Rectangle
+	StaticFill  [][]color.Color
+	Refresh     func(*Component)
+	Selected    bool
+	Actions     InputActions
+	RefreshRate int
+	State       ComponentState
 }
 
 func CreateComponent(cnv *rgbmatrix.Canvas, x int, y int, width int, height int, fill [][]color.Color) *Component {
@@ -30,6 +37,12 @@ func CreateComponent(cnv *rgbmatrix.Canvas, x int, y int, width int, height int,
 	c.Placement.Min.Y = y
 	c.Placement.Max.X = x + width
 	c.Placement.Max.Y = y + height
+	c.Actions.Click = func() {}
+	c.Actions.DoubleClick = func() {}
+	c.Actions.TripleClick = func() {}
+	c.Actions.HoldClick = func() {}
+	c.Actions.ScrollLeft = func() {}
+	c.Actions.ScrollRight = func() {}
 	c.State = make(ComponentState)
 	c.StaticFill = make([][]color.Color, width)
 	for i := 0; i < width; i++ {

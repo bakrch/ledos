@@ -167,21 +167,54 @@ func Get(endpoint string, jsonStruct interface{}) {
 	err = json.Unmarshal(body, &jsonStruct)
 	screamAndDie(err, apiLog)
 	// fmt.Println(endpoint, ": ", jsonStruct.Device)
+}
 
+func Post(endpoint string, jsonStruct interface{}) {
+	req, err := http.NewRequest("POST", "https://api.spotify.com/v1"+endpoint, nil)
+	screamAndDie(err, apiLog)
+	req.Header.Set("Authorization", "Bearer "+accessToken.AccessToken)
+	// Make the API request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	screamAndDie(err, apiLog)
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	screamAndDie(err, apiLog)
+	err = json.Unmarshal(body, &jsonStruct)
+	screamAndDie(err, apiLog)
+	// fmt.Println(endpoint, ": ", jsonStruct.Device)
+}
+
+func NextTrack() {
+	var pd PlayerData
+	Post("/me/player/next", &pd)
+}
+
+func PreviousTrack() {
+	var pd PlayerData
+	Post("/me/player/previous", &pd)
+}
+
+func PausePlayback() {
+	var pd PlayerData
+	Post("/me/player/pause", &pd)
+}
+
+func ResumePlayback() {
+	var pd PlayerData
+	Post("/me/player/", &pd)
 }
 
 func GetPlaybackState() *PlayerData {
 	var pd PlayerData
 	Get("/me/player", &pd)
 	return &pd
-
 }
 
 func GetTrackName() string {
 	var pd PlayerData
 	Get("/me/player", &pd)
 	return pd.Item.Name
-
 }
 
 func getToken(code string) (token *tokenResponse, err error) {

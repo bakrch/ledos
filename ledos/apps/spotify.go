@@ -84,7 +84,9 @@ func prevTrackComponent() *uilib.Component {
 		}
 
 	}
-	return uilib.CreateComponent(canvas, 35, 5, 4, 7, fill)
+	c := uilib.CreateComponent(canvas, 35, 5, 4, 7, fill)
+	c.Actions.Click = func() { spotify.PreviousTrack() }
+	return c
 }
 
 func pauseTrackComponent() *uilib.Component {
@@ -102,7 +104,9 @@ func pauseTrackComponent() *uilib.Component {
 			}
 		}
 	}
-	return uilib.CreateComponent(canvas, 44, 5, 7, 7, fill)
+	c := uilib.CreateComponent(canvas, 44, 5, 7, 7, fill)
+	c.Actions.Click = func() { spotify.ResumePlayback() }
+	return c
 }
 
 func nextTrackComponent() *uilib.Component {
@@ -123,7 +127,9 @@ func nextTrackComponent() *uilib.Component {
 			}
 		}
 	}
-	return uilib.CreateComponent(canvas, 56, 5, 4, 7, fill)
+	c := uilib.CreateComponent(canvas, 56, 5, 4, 7, fill)
+	c.Actions.Click = func() { spotify.NextTrack() }
+	return c
 }
 
 func trackBannerComponent() *uilib.Component {
