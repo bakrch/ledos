@@ -10,7 +10,7 @@ import (
 type OsController struct {
 	canvas      *rgbmatrix.Canvas
 	apps        []*uilib.UI
-	selectedApp *uilib.UI
+	SelectedApp *uilib.UI
 }
 
 func CreateMainController(cnv *rgbmatrix.Canvas) OsController {
@@ -20,10 +20,10 @@ func CreateMainController(cnv *rgbmatrix.Canvas) OsController {
 	spotifyApp := apps.Spotify(oc.canvas)
 
 	oc.apps = append(oc.apps, spotifyApp)
-	oc.selectedApp = oc.apps[0]
+	oc.SelectedApp = oc.apps[0]
 	return oc
 }
 
 func (oc *OsController) Run() {
-	oc.selectedApp.Render()
+	oc.SelectedApp.Render()
 }

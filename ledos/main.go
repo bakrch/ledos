@@ -2,6 +2,7 @@ package ledos
 
 import (
 	"flag"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -26,10 +27,6 @@ func Render() {
 }
 
 func Dashboard() {
-	whiteColor := color.RGBA{R: 255, G: 0, B: 0, A: 255} // This is a lie
-	writeText(Canvas, 4, 8, "GUTTEN TAG", whiteColor)
-	writeText(Canvas, 4, 18, "GUTTEN TAG", whiteColor)
-	writeText(Canvas, 4, 28, "GUTTEN TAG", whiteColor)
 	Canvas.Render()
 }
 
@@ -70,14 +67,14 @@ func FillColor(color color.Color) {
 func Sakura() {
 	customColor := color.RGBA{R: 255, G: 0, B: 0, A: 255}
 	// drawImage(Canvas, "./ledos/static/img/sakura-bg.png")
-	writeText(Canvas, 4, 8, "GUTTEN TAG", customColor)
+	WriteText("GUTTEN TAG", customColor)
 	Canvas.Render()
 	// scanner := bufio.NewScanner(os.Stdin)
 	// fmt.Println("Press Enter to exit...")
 	// scanner.Scan()
 }
 
-func loadFont(path string) font.Face {
+func loadFont() font.Face {
 	fontData, err := os.ReadFile("./ledos/static/font/tiny.otf")
 	fatal(err, debugLog)
 
@@ -130,23 +127,39 @@ func initRgbMatrix() rgbmatrix.Matrix {
 	return matrix
 }
 
-func writeText(canvas draw.Image, x int, y int, text string, textColor color.Color) {
-
-	f := loadFont("Hack-Regular.ttf")
-
+func WriteText(text string, textColor color.Color) [][]color.Color {
+	// each character takes three pixels, plus one pixel for the space
+	imageWidth := len(text) * 4
+	if imageWidth < 26 {
+		imageWidth = 26
+	}
+	f := loadFont()
+	img := image.NewRGBA(image.Rectangle{
+		Min: image.Point{
+			X: 0,
+			Y: 0,
+		},
+		Max: image.Point{
+			X: imageWidth,
+			Y: 5,
+		},
+	})
+	draw.Draw(img, img.Bounds(), &image.Uniform{color.Black}, image.Point{0, 0}, draw.Src)
 	// Create a drawer
 	d := &font.Drawer{
-		Dst:  canvas,
+		Dst:  img,
 		Src:  image.NewUniform(textColor),
 		Face: f,
-		Dot:  fixed.Point26_6{X: fixed.I(x), Y: fixed.I(y)},
+		Dot:  fixed.Point26_6{X: fixed.I(0), Y: fixed.I(5)},
 	}
 
 	// Draw the text
 	d.DrawString(text)
+	fmt.Println("drawn text: ", img)
+	return DrawImage(img)
 }
 
-func DrawImage(canvas *rgbmatrix.Canvas, img image.Image, at image.Point) [][]color.Color {
+func DrawImage(img image.Image) [][]color.Color {
 	// Create a new RGBA image with the same bounds as the original image
 	bounds := img.Bounds()
 	imgArray := make([][]color.Color, bounds.Max.X-bounds.Min.X)
@@ -157,7 +170,6 @@ func DrawImage(canvas *rgbmatrix.Canvas, img image.Image, at image.Point) [][]co
 			imgArray[x-bounds.Min.X][y-bounds.Min.Y] = img.At(x, y)
 		}
 	}
-	// draw.Draw(canvas, canvas.Bounds(), rgba, at, draw.Src)
 	return imgArray
 }
 

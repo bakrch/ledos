@@ -45,7 +45,9 @@ type album struct {
 }
 
 type item struct {
-	Album album `json:"album"`
+	Album album  `json:"album"`
+	Name  string `json:"name"`
+	Id    string `json:"id"`
 }
 
 type PlayerData struct {
@@ -172,6 +174,13 @@ func GetPlaybackState() *PlayerData {
 	var pd PlayerData
 	Get("/me/player", &pd)
 	return &pd
+
+}
+
+func GetTrackName() string {
+	var pd PlayerData
+	Get("/me/player", &pd)
+	return pd.Item.Name
 
 }
 

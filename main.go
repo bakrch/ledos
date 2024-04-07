@@ -3,14 +3,16 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"image"
 	"image/color"
 	"log"
 	"main/api/spotify"
 	"main/ledos"
 	"main/ledos/gpio"
-	"main/uilib"
 	"os"
+	"os/exec"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -29,7 +31,7 @@ func loadDotEnv() {
 func main() {
 	var text string
 	var err error
-
+	var GLOBAL_REFRESH_RATE int = 400
 	loadDotEnv()
 	encoderRotation := make(chan int)
 	reader := bufio.NewReader(os.Stdin)
@@ -37,40 +39,45 @@ func main() {
 	// DEBUG
 	// spotify.Init()
 	// spotify.TriggerAuth()
-	var img = make([][]color.Color, 10)
-	for i := 0; i < 10; i++ {
-		img[i] = make([]color.Color, 10)
-
-		for j := 0; j < 10; j++ {
-			img[i][j] = color.White
-		}
+	ledos.Render()
+	spotify.Init()
+	cmd := exec.Command(os.Getenv("BROWSER"), []string{"--new-tab", "--url", "localhost:8080/login"}...)
+	cmdErr := cmd.Run()
+	if cmdErr != nil {
+		fmt.Println("Error executing cmd", cmdErr)
+		return
 	}
 
-	// customColor := color.RGBA{R: 0, G: 0, B: 255, A: 255}
-	// ledos.DrawIsoscelesTriangle(image.Point{X: 32, Y: 8}, 5, 1, customColor)
-
-	var c1 = uilib.CreateComponent(ledos.Canvas, 10, 10, 10, 10, img)
-	var c2 = uilib.CreateComponent(ledos.Canvas, 30, 10, 10, 10, img)
-	c1.Render(ledos.Canvas)
-	c2.Render(ledos.Canvas)
-	c1.SimpleHighlight()
-	ledos.Render()
-while:
+	done := make(chan bool)
+	stop := make(chan bool)
+loop:
 	for {
 		text, err = reader.ReadString('\n')
 		screamAndDie(err, mainLog)
 
 		switch text {
 		case "q\n":
-			break while
+			break loop
 
 		case "m\n":
 			oc := gpio.CreateMainController(ledos.Canvas)
 
 			oc.Run()
-			ledos.Render()
+
+			go func() {
+				ticker := time.NewTicker(time.Duration(GLOBAL_REFRESH_RATE) * time.Millisecond)
+				defer ticker.Stop()
+				for {
+					select {
+					case <-ticker.C:
+						ledos.Render()
+					case <-stop:
+						done <- true
+						return
+					}
+				}
+			}()
 		case "s\n":
-			spotify.Init()
 		case "gpio\n":
 			go gpio.TestGpio(encoderRotation)
 		case "tr\n":

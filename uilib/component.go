@@ -1,12 +1,13 @@
 package uilib
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 
 	rgbmatrix "github.com/zaggash/go-rpi-rgb-led-matrix"
 )
+
+type ComponentState map[string]interface{}
 
 type Input struct {
 	Type string
@@ -15,22 +16,21 @@ type InputAction map[Input]func()
 type Component struct {
 	Placement    image.Rectangle
 	StaticFill   [][]color.Color
-	DynamicFill  func() [][]color.Color
+	Refresh      func(*Component)
 	Selected     bool
 	InputActions []InputAction
+	RefreshRate  int
+	State        ComponentState
 }
 
-func (c Component) AmazingFunction() int {
-	return c.Placement.Max.X - c.Placement.Min.X
-}
-
-func CreateComponent(cnv *rgbmatrix.Canvas, x int, y int, width int, height int, fill [][]color.Color) Component {
+func CreateComponent(cnv *rgbmatrix.Canvas, x int, y int, width int, height int, fill [][]color.Color) *Component {
 	var c Component
-	canvas = cnv
+	c.RefreshRate = 0
 	c.Placement.Min.X = x
 	c.Placement.Min.Y = y
 	c.Placement.Max.X = x + width
 	c.Placement.Max.Y = y + height
+	c.State = make(ComponentState)
 	c.StaticFill = make([][]color.Color, width)
 	for i := 0; i < width; i++ {
 		c.StaticFill[i] = make([]color.Color, height)
@@ -39,7 +39,17 @@ func CreateComponent(cnv *rgbmatrix.Canvas, x int, y int, width int, height int,
 			c.StaticFill[i][j] = fill[i][j]
 		}
 	}
-	return c
+	return &c
+}
+func (c *Component) SetRefreshRoutine(refreshFn func(*Component)) {
+	c.Refresh = refreshFn
+}
+func (c *Component) SetRefreshRate(refreshRate int) {
+	c.RefreshRate = refreshRate
+}
+
+func (c *Component) SetState(key string, value interface{}) {
+	c.State[key] = value
 }
 
 func interpolateColor(c1, c2 color.RGBA, t float64) color.RGBA {
@@ -50,8 +60,7 @@ func interpolateColor(c1, c2 color.RGBA, t float64) color.RGBA {
 	return color.RGBA{r, g, b, a}
 }
 
-func (c Component) Highlight() {
-	fmt.Print("HIGHLITING ON")
+func (c *Component) Highlight() {
 	rainbow := []color.RGBA{
 		{255, 0, 0, 255},   // Red
 		{255, 127, 0, 255}, // Orange
@@ -91,13 +100,7 @@ func (c Component) Highlight() {
 	}
 }
 func (c Component) SimpleHighlight() {
-	fmt.Print("SIMPLE HIGHLITING ON")
 	color := color.RGBA{255, 0, 0, 255}
-	fmt.Println("")
-	fmt.Println("min.X", c.Placement.Min.X)
-	fmt.Println("min.X", c.Placement.Min.Y)
-	fmt.Println("Max.X", c.Placement.Max.X)
-	fmt.Println("Max.Y", c.Placement.Max.Y)
 	for x := c.Placement.Min.X; x < c.Placement.Max.X; x++ {
 		canvas.Set(x, c.Placement.Min.Y, color)
 		canvas.Set(x, c.Placement.Max.Y, color)
@@ -114,7 +117,6 @@ func (c Component) Render(canvas *rgbmatrix.Canvas) {
 	for x := c.Placement.Min.X; x < c.Placement.Max.X; x++ {
 		j := 0
 		for y := c.Placement.Min.Y; y < c.Placement.Max.Y; y++ {
-			fmt.Println("i, j", i, j)
 			canvas.Set(x, y, c.At(i, j))
 			j++
 		}
