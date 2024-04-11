@@ -45,7 +45,6 @@ func main() {
 	cmdErr := cmd.Run()
 	if cmdErr != nil {
 		fmt.Println("Error executing cmd", cmdErr)
-		return
 	}
 
 	done := make(chan bool)
