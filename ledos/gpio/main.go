@@ -76,11 +76,10 @@ func InputController(direction <-chan int) {
 			for clkPin.Read() != baseClk {
 			}
 		}
-		if sw == rpio.Low && swPrevious == rpio.High {
+		if sw != swPrevious {
 			fmt.Println("Executing click action")
 			oc.CurrentApp().ExecuteComponentAction(0)
 			swPrevious = sw
 		}
-
 	}
 }
