@@ -48,13 +48,16 @@ func InputController(direction <-chan int) {
 	var (
 		clk rpio.State
 		//dt  rpio.State
-		//sw  rpio.State
+		sw         rpio.State
+		swPrevious rpio.State
 	)
 	var counter = 0
+	sw = swPin.Read()
+	swPrevious = sw
 	for {
 		clk = clkPin.Read()
 		//dt = dtPin.Read()
-		//sw = swPin.Read()
+		sw = swPin.Read()
 		if clk != baseClk {
 			//dt = dtPin.Read()
 			if dtPin.Read() != clk {
@@ -73,5 +76,10 @@ func InputController(direction <-chan int) {
 			for clkPin.Read() != baseClk {
 			}
 		}
+		if sw == rpio.High && swPrevious == rpio.Low {
+			oc.CurrentApp().ExecuteComponentAction(0)
+			swPrevious = sw
+		}
+
 	}
 }

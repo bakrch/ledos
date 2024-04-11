@@ -160,8 +160,6 @@ func trackBannerComponent() *uilib.Component {
 			img, ok := c.State["baseImage"].([][]color.Color)
 			if ok {
 				var scrolledImg [][]color.Color
-				fmt.Println("len(img):", len(img))
-				fmt.Println("Pos, len(img):", pos, len(img))
 				if pos+26 /*viewport size*/ > imgLen-1 {
 
 					firstSegment, secondSegment := img[pos:], img[:(pos+26)-imgLen]
@@ -170,7 +168,6 @@ func trackBannerComponent() *uilib.Component {
 					scrolledImg = img[pos : pos+26]
 				}
 
-				fmt.Println("len(scrolledImg):", len(scrolledImg))
 				c.StaticFill = scrolledImg
 			} else {
 				fmt.Println("Failed to parse State.baseImage : ", c.State["baseImage"])
