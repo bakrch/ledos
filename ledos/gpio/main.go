@@ -47,16 +47,16 @@ func InputController(direction <-chan int) {
 	// var previousDt rpio.State = 1
 	var (
 		clk rpio.State
-		dt  rpio.State
+		//dt  rpio.State
 		//sw  rpio.State
 	)
 	var counter = 0
 	for {
 		clk = clkPin.Read()
-		dt = dtPin.Read()
+		//dt = dtPin.Read()
 		//sw = swPin.Read()
 		if clk != baseClk {
-			dt = dtPin.Read()
+			//dt = dtPin.Read()
 			if dtPin.Read() != clk {
 				counter++
 			} else {
