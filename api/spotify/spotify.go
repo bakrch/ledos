@@ -178,10 +178,10 @@ func Post(endpoint string, jsonStruct interface{}) {
 	resp, err := client.Do(req)
 	screamAndDie(err, apiLog)
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	screamAndDie(err, apiLog)
-	err = json.Unmarshal(body, &jsonStruct)
-	screamAndDie(err, apiLog)
+	// err = json.Unmarshal(body, &jsonStruct)
+	// screamAndDie(err, apiLog)
 	// fmt.Println(endpoint, ": ", jsonStruct.Device)
 }
 
