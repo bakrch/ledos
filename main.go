@@ -79,7 +79,7 @@ loop:
 			}()
 		case "s\n":
 		case "gpio\n":
-			go gpio.TestGpio(encoderRotation)
+			go gpio.InputController(encoderRotation)
 		case "tr\n":
 			customColor := color.RGBA{R: 0, G: 0, B: 255, A: 255}
 			ledos.DrawIsoscelesTriangle(image.Point{X: 32, Y: 8}, 5, 1, customColor)

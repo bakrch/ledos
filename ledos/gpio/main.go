@@ -2,8 +2,6 @@ package gpio
 
 import (
 	"fmt"
-	"image"
-	"image/color"
 	"main/ledos"
 	"time"
 
@@ -74,7 +72,8 @@ func InputController(direction <-chan int) {
 			// To prevent it from reading more than once per rotary encoder rotatio
 			for clkPin.Read() != baseClk {
 			}
-			ledos.Render()
+			oc.CurrentApp().SelectNextComponent()
+			fmt.Println("Current component: ", oc.CurrentApp().ActiveComponent)
 		}
 	}
 }

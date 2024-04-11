@@ -8,18 +8,19 @@ import (
 )
 
 type ComponentState map[string]interface{}
+type Action int
 
-type Input struct {
-	Type string
-}
-type InputActions struct {
-	Click       func()
-	DoubleClick func()
-	TripleClick func()
-	HoldClick   func()
-	ScrollLeft  func()
-	ScrollRight func()
-}
+const (
+	Click Action = iota
+	DoubleClick
+	TripleClick
+	HoldClick
+	ScrollLeft
+	ScrollRight
+)
+
+type InputActions map[Action]func()
+
 type Component struct {
 	Placement   image.Rectangle
 	StaticFill  [][]color.Color
@@ -37,12 +38,13 @@ func CreateComponent(cnv *rgbmatrix.Canvas, x int, y int, width int, height int,
 	c.Placement.Min.Y = y
 	c.Placement.Max.X = x + width
 	c.Placement.Max.Y = y + height
-	c.Actions.Click = func() {}
-	c.Actions.DoubleClick = func() {}
-	c.Actions.TripleClick = func() {}
-	c.Actions.HoldClick = func() {}
-	c.Actions.ScrollLeft = func() {}
-	c.Actions.ScrollRight = func() {}
+	c.Actions = make(map[Action]func(), 6)
+	c.Actions[Click] = func() {}
+	c.Actions[DoubleClick] = func() {}
+	c.Actions[TripleClick] = func() {}
+	c.Actions[HoldClick] = func() {}
+	c.Actions[ScrollLeft] = func() {}
+	c.Actions[ScrollRight] = func() {}
 	c.State = make(ComponentState)
 	c.StaticFill = make([][]color.Color, width)
 	for i := 0; i < width; i++ {
