@@ -21,15 +21,15 @@ func Spotify(cnv *rgbmatrix.Canvas) *uilib.UI {
 	canvas = cnv
 	spotify := uilib.CreateUI(cnv)
 	albumImage := albumComponent()
-	nextTrack := prevTrackComponent()
+	prevTrack := prevTrackComponent()
 	pauseTrack := pauseTrackComponent()
-	previousTrack := nextTrackComponent()
+	nextTrack := nextTrackComponent()
 	trackBanner := trackBannerComponent()
 
 	spotify.AddComponent(albumImage)
-	spotify.AddComponent(nextTrack)
+	spotify.AddComponent(prevTrack)
 	spotify.AddComponent(pauseTrack)
-	spotify.AddComponent(previousTrack)
+	spotify.AddComponent(nextTrack)
 	spotify.AddComponent(trackBanner)
 	return &spotify
 }
