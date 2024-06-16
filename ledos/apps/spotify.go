@@ -40,12 +40,15 @@ func albumComponent() *uilib.Component {
 		trackId := playbackState.Item.Id
 		if trackId != c.State["trackId"] {
 			c.State["trackId"] = trackId
+			c.State["imagePath"] = nil
 		} else {
-			imgPath := api.DownloadImage(playbackState.Item.Album.Images[0].Url)
-			img := utils.LoadImage(imgPath)
-			resizedImg := resize.Resize(30, 30, img, resize.Lanczos3)
-			c.StaticFill = ledos.DrawImage(resizedImg)
-
+			if c.State["imagePath"] == nil {
+				imgPath := api.DownloadImage(playbackState.Item.Album.Images[0].Url)
+				img := utils.LoadImage(imgPath)
+				resizedImg := resize.Resize(30, 30, img, resize.Lanczos3)
+				c.StaticFill = ledos.DrawImage(resizedImg)
+				c.State["imagePath"] = imgPath
+			}
 		}
 	}
 	playbackState := spotify.GetPlaybackState()
@@ -57,6 +60,7 @@ func albumComponent() *uilib.Component {
 
 	track := uilib.CreateComponent(canvas, 1, 1, 30, 30, fill)
 	track.SetState("trackId", playbackState.Item.Id)
+	track.SetState("imagePath", nil)
 	track.SetRefreshRate(2000)
 	track.SetRefreshRoutine(refreshFn)
 	return track
